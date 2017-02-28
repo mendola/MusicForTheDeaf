@@ -1,0 +1,90 @@
+#include<iostream>
+#include<fstream>
+#include "readWav.h"
+using namespace std;
+
+int sampleRate = 44100;
+int bitDepth = 8;
+float windowTime = 0.10;
+
+WavReader::WavReader()
+{
+int m_bufflength = -1;
+}
+
+WavReader::~WavReader()
+{
+
+}
+
+int WavReader::init()
+{
+this->m_buffLength = -1;
+this->m_maxdur = 1000;
+ if (is) {
+    // get length of file:
+    is.seekg (0, is.end);
+    int length = is.tellg();
+    is.seekg (0, is.beg);
+
+    // allocate memory:
+    char * buffer = new char [length];
+
+    // read data as a block:
+    is.read (buffer,length);
+
+    is.close();
+
+    // print content:
+    std::cout.write (buffer,length);
+
+    delete[] buffer;
+  }
+}
+
+int WavReader::GetWavInfo(ifstream& iFile)
+{
+//////METHOD TO GET SAMPLE RATE///////////
+int bitDepth = 8;
+	std::cout << "Bit Depth = " << std::cout <<bitDepth;
+return 0;
+}
+
+int WavReader::ReadWav(ifstream& iFile, int *buffer)
+{
+int n = 0;
+cout<<"ReadWav run"<<endl;
+
+	//Open an input and output stream in binary mode
+	if(iFile.is_open())
+	{
+	cout<<"File is open"<<endl;
+	cout<<"m_packetLength="<<m_packetLength<<endl;
+	while(n < m_packetLength)
+	{
+			int loc = iFile.tellg();
+			iFile.read(buffer,m_packetLength);
+			cout <<n<<":"<<loc<<endl;
+			n++;
+    // get length of file:
+   // is.seekg (0, is.end);
+   // int length = is.tellg();
+   // is.seekg (0, is.beg);
+
+    delete[] buffer;
+  }
+
+	}
+	}
+	else
+	{
+	cout<<"Not opened"<<endl;
+	}
+
+//	for(n=0; n<m_maxdur; n++)
+//	{
+//		cout<<buffer[n]<<" ";
+//	}
+return 0;
+
+}

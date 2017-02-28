@@ -1,0 +1,21 @@
+#ifndef WAVREADER_H
+#define WAVEREADR_H
+
+
+class WavReader
+{
+
+public:
+	WavReader();
+	~WavReader();
+	int GetWavInfo(std::istream& iFile);
+        int ReadWav(std::ifstream& iFile, int* buffer, int buffLength);
+
+private:
+	int m_buffLength;
+	int m_maxdur;
+};
+
+#endif
+int WavReader::GetWavInfo(istream& iFile)
+
