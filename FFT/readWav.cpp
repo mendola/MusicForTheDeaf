@@ -7,43 +7,23 @@
 #include <cstring>
 using namespace std;
 
-float windowTime = 0.10;
+float windowTime = WINDOWTIME;
 
 WavReader::WavReader()
 {
-int m_packetLength;
-//char* m_buff;
-int m_songLength = 0;
-int m_sampleRate = 0;
-
-//this->m_packetLength = windowTime * bitDepth/8 * sampleRate;
-//this->wm_buff[m_packetLength];
+  int m_packetLength;
+  int m_songLength = 0;
+  int m_sampleRate = 0;
 }
 
 WavReader::~WavReader()
 {
-delete [] m_buff;
-// delete m_buff;
+  delete [] m_buff;
 }
-
-int WavReader::init()
-{
-cout<<"windowTime = "<<windowTime<<endl;
-//this->m_packetLength = windowTime * bitDepth/8 * sampleRate;
-//cout<<"m_packetLength = "<<this->m_packetLength<<endl;
-//this->m_buff[this->m_packetLength];
-//this->m_packetLength = 10;
-//m_buff = new char[this->m_packetLength];
-//this->m_sampleRate = sampleRate;
-}
-
-
 
 int WavReader::GetWavInfo(ifstream& iFile)
 {
-//////METHOD TO GET SAMPLE RATE///////////
-//int bitDepth = 8;
-//	std::cout << "Bit Depth = " << std::cout <<bitDepth;
+//////METHOD TO PARSE DATA FROM WAV FILE HEADER///////////
 
 if(iFile)
 {
@@ -77,7 +57,6 @@ if(iFile)
   	cout<<"Error: Incompatible encoding format"<<endl;
   	return 1;
   }
-
   for(int i = 0; i<4; i++)
   {
   	temp[i] = 0;
@@ -92,11 +71,11 @@ if(iFile)
   }
   temp[0] = 0;
   iFile.read((char*)temp,2); //Read in number of channels (mono or stereo)
-  m_numChannels = *(int*)temp;
+  this->m_numChannels = *(int*)temp;
   cout<<"Number of channels: "<< m_numChannels <<endl;
 
   iFile.read((char*)temp,4); //Read in the sample rate (usually 44100, maybe 8000)
-  m_sampleRate = *(int*)temp;
+  this->m_sampleRate = *(int*)temp;
 
   iFile.read((char*)temp,4); // Read in ByteRate. = SampleRate *NumChannels *BitsPerSample / 8
   int ByteRate = *(int*)temp;
@@ -114,16 +93,26 @@ if(iFile)
 
   iFile.seekg(4,iFile.cur); //Skip the string "data"
 
-  iFile.read((char*)temp,4); //Read in the length of the data
+  iFile.read((char*)temp,4); //Read in the length of the data in bytes
   int dataLength = *(int*)temp;
 
+
+  // @m_songLength -- Total number of samples for one channel
   this->m_songLength = floor(dataLength / this->m_numChannels * 8 / m_bitDepth);
   cout << "m_songLength = " << m_songLength<<endl;
 
+  // @m_packetLength -- Number of samples in one epoch/time window
   this->m_packetLength = windowTime * m_sampleRate;
   cout<< "m_packetLength = "<<m_packetLength<<endl;
 
+  // @m_buff -- Buffer to hold data
   m_buff = new char[this->m_packetLength * this->m_bitDepth / 8];
+
+  // @m_bytesPerSample -- Number of bytes for one sample of one channel
+  this->m_bytesPerSample = this->m_bitDepth / 8;
+  
+  // @m_skippedBytes -- Number of bytes to skip from other channel at each sample
+  this->m_skippedBytes = this->m_bytesPerSample * (this->m_numChannels - 1);
 }
 else return 1;
 return 0;
@@ -133,56 +122,28 @@ return 0;
 
 int WavReader::ReadWav(ifstream& iFile)
 {
-//cout<<"ReadWav run"<<endl;
-
-	//Open an input and output stream in binary mode
 	if(iFile.is_open())
 	{
-//	  cout<<"File is open"<<endl;
-//	  cout<<"m_packetLength="<<this->m_packetLength<<endl;
-//	  cout<<"m_songLength=" << this->m_songLength<<endl;
-			int loc = iFile.tellg();
-      cout<<"Location: "<<loc<<endl;
-                       // cout <<"location: "<<loc<<endl;
+      int loc = iFile.tellg();                      
 			char a;
 	  for(int n=0; n<m_packetLength; n++)
 	  {
-			iFile.read((char*)&m_buff[2*n],2);//this->m_packetLength);
+			iFile.read((char*)&m_buff[this->m_bytesPerSample*n],this->m_bytesPerSample);//this->m_packetLength);
       if(!iFile)
       {
         cout<<"READ ERROR"<<endl;
         return 1;
-  
-
       }
-			iFile.seekg(2,iFile.cur);
-			//a = m_buff[2*n];
-			//m_buff[2*n] = m_buff[2*n+1];
-			//m_buff[2*n+1] = a;
-
-//                        iFile.read(newbuff,pack);//this->m_packe$
+			iFile.seekg(this->m_skippedBytes,iFile.cur);
 	  }
-//	  cout<<"Data Successfully read"<<endl;
 	}
 	else
 	{
 	  cout<<"Not opened"<<endl;
 	}
 
-//	for(n=0; n<m_maxdur; n++)
-//	{
-//		cout<<buffer[n]<<" ";
-//	}
 return 0;
 
-}
-
-int WavReader::Finish(ifstream& iFile)
-{
-//delete [] m_buff;
-iFile.seekg(0,iFile.beg);
-cout<<"Deleted Buffer from memory"<<endl;
-return 0;
 }
 
 int WavReader::GetPacketLength()
