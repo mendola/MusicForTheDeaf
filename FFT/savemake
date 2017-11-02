@@ -1,2 +1,4 @@
 g++ readWav.cpp runTestReadWav.cpp /home/alex/kiss_fft130/kiss_fft.c /home/alex/kiss_fft130/tools/kiss_fftr.c -o readWav -I/home/alex/FFT/ -I/home/alex/kiss_fft130 -g
 
+Run in the FFT directory (I think) with:
+./readWav <Name of song (including .wav)>

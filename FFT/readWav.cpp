@@ -21,6 +21,7 @@ WavReader::~WavReader()
   delete [] m_buff;
 }
 
+//Reads info header of wav file
 int WavReader::GetWavInfo(ifstream& iFile)
 {
 //////METHOD TO PARSE DATA FROM WAV FILE HEADER///////////
@@ -119,21 +120,24 @@ return 0;
 }
 
 
-
+//Reads one tine window worth of samples into m_buff
 int WavReader::ReadWav(ifstream& iFile)
 {
 	if(iFile.is_open())
 	{
-      int loc = iFile.tellg();                      
-			char a;
+      int loc = iFile.tellg(); // get current location                  
+      char a;
+    //Loop for number samples in time window
 	  for(int n=0; n<m_packetLength; n++)
 	  {
+      // Read one sample
 			iFile.read((char*)&m_buff[this->m_bytesPerSample*n],this->m_bytesPerSample);//this->m_packetLength);
       if(!iFile)
       {
         cout<<"READ ERROR"<<endl;
         return 1;
       }
+      // Skip other track in case of stereo file (might want to not do this)
 			iFile.seekg(this->m_skippedBytes,iFile.cur);
 	  }
 	}
