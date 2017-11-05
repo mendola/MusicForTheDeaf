@@ -4,6 +4,11 @@
 #include <stdint.h>
 using namespace std;
 
+#ifndef REALTIME
+#define REALTIME false
+#endif
+
+
 #define WINDOWTIME 0.1
 #define BASSBANDBEGIN 20
 #define BASSBANDEND 70
@@ -11,7 +16,10 @@ using namespace std;
 #define MIDBANDEND 300
 #define TREBLEBANDBEGIN 301
 #define TREBLEBANDEND 2000
-#define MUSICLIBRARY "/home/alex/Music"   // Directory where you're keeping .WAV files
+
+#define MUSICLIBRARY "/home/alex/Music"
+
+
 class WavReader
 {
 public:
@@ -22,7 +30,7 @@ public:
 	int ReadWav(ifstream& iFile);
 	int GetPacketLength();
 	int GetSongLength();
-        char* m_buff; // Holds one time window of samples
+        char* m_buff;
 	int m_sampleRate;
 	int m_numChannels;
 	int m_bitDepth;
