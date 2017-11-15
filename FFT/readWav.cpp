@@ -27,6 +27,7 @@ int WavReader::GetWavInfo(ifstream& iFile)
 
 if(iFile)
 {
+  cout<<"Opened file."<<endl;
   iFile.seekg(0, iFile.beg);
 
   char temp[4];
@@ -91,12 +92,21 @@ if(iFile)
   m_bitDepth = *(int*)temp;
   cout<<"Bits per Sample: "<<m_bitDepth<<endl;
 
-  iFile.seekg(4,iFile.cur); //Skip the string "data"
 
-  iFile.read((char*)temp,4); //Read in the length of the data in bytes
-  int dataLength = *(int*)temp;
-
-
+  while (1){
+    iFile.read((char*)temp,4); //Read in the name of the section
+    cout << "Reading "<<temp<<" section." <<endl;
+    if((strcmp(temp, "data") == 0) || (strcmp(temp,"DATA") == 0)){
+      cout<<"Found the data section (the music)"<<endl;
+      break;
+    } else{
+      iFile.read((char*)temp,4); //Read in the length of the data in bytes
+      iFile.seekg(*(uint32_t*)temp,iFile.cur); //Skip the string
+    }
+  }
+    iFile.read((char*)temp,4); //Read in the length of the data section in bytes
+    int dataLength = *(int*)temp;
+    cout << "dataLength = " << dataLength<<endl;
   // @m_songLength -- Total number of samples for one channel
   this->m_songLength = floor(dataLength / this->m_numChannels * 8 / m_bitDepth);
   cout << "m_songLength = " << m_songLength<<endl;
@@ -110,7 +120,7 @@ if(iFile)
 
   // @m_bytesPerSample -- Number of bytes for one sample of one channel
   this->m_bytesPerSample = this->m_bitDepth / 8;
-  
+
   // @m_skippedBytes -- Number of bytes to skip from other channel at each sample
   this->m_skippedBytes = this->m_bytesPerSample * (this->m_numChannels - 1);
 }
@@ -124,7 +134,7 @@ int WavReader::ReadWav(ifstream& iFile)
 {
 	if(iFile.is_open())
 	{
-      int loc = iFile.tellg();                      
+      int loc = iFile.tellg();
 			char a;
 	  for(int n=0; n<m_packetLength; n++)
 	  {

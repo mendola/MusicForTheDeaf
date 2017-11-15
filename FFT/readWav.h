@@ -17,7 +17,7 @@ using namespace std;
 #define TREBLEBANDBEGIN 301
 #define TREBLEBANDEND 2000
 
-#define MUSICLIBRARY "/home/alex/Music"
+#define MUSICLIBRARY "/home/local/ANT/mendolaa/Music"
 
 
 class WavReader

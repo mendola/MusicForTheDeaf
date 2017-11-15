@@ -8,7 +8,7 @@
 #include <time.h>
 using namespace std;
 
-ofstream oFile; // unused output file 
+ofstream oFile; // unused output file
 clock_t t0;
 clock_t t1;
 float clockPeriod = 1.0/CLOCKS_PER_SEC;
@@ -26,7 +26,11 @@ if(0 > sprintf(filepath, "%s/%s",library,argv[1]))
 
 // Input stream for opening and reading wav file
 ifstream input(filepath,ios::in | ios::binary);
-cout << "Filepath: "<<filepath<<endl;
+if(input.is_open()){
+	cout << "Filepath: "<<filepath<<endl;
+}else{
+	cout <<"ERROR: failed to open "<<filepath<<"\n"<<endl;
+}
 
 //Reads in header of WAV
 if(0 != wvRdr.GetWavInfo(input))
@@ -83,9 +87,9 @@ for(int i = 0; i<epochCount -1; i++)
 
 	// Copy the time-domain sample buffer from wvRdr into samples (this step should be removed)
 	memcpy(samples,wvRdr.m_buff,nfft*2);
-   
+
    // Perform FFT (put frequency-domain data into spectrum)
-   	kiss_fftr(cfg, (kiss_fft_scalar*)samples , spectrum);	
+   	kiss_fftr(cfg, (kiss_fft_scalar*)samples , spectrum);
 
 
 //******************************************************//
@@ -130,7 +134,7 @@ for(int i = 0; i<epochCount -1; i++)
  	maxVal = -1;
 	maxIndex = -1;
 
-// Same as above for treble band	
+// Same as above for treble band
  for(int j = TrebBegin; j<=TrebEnd;j++)
  {
 
@@ -172,4 +176,3 @@ input.close();
 oFile.close();
 return 0;
 }
-
