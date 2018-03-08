@@ -35,8 +35,8 @@ if(input.is_open()){
 //Reads in header of WAV
 if(0 != wvRdr.GetWavInfo(input))
 {
-cout<<"Error: Problem with WAV File. Exiting..."<<endl;
-return 1;
+	cout<<"Error: Problem with WAV File. Exiting..."<<endl;
+	return 1;
 }
 int nfft = wvRdr.GetPacketLength();
 cout <<"nfft = "<<nfft<<endl;
@@ -74,8 +74,7 @@ cout << freqConst<<endl;
 	int MidEnd = MIDBANDEND / freqConst;
 
 // Loops over the number of time windows (epochs)
-for(int i = 0; i<epochCount -1; i++)
-{
+for(int i = 0; i<epochCount -1; i++) {
 	t0 = clock();
 	cout << "epoch: " << i << " of "<<epochCount -2 <<"|";
 	maxVal = -1;
@@ -88,8 +87,8 @@ for(int i = 0; i<epochCount -1; i++)
 	// Copy the time-domain sample buffer from wvRdr into samples (this step should be removed)
 	memcpy(samples,wvRdr.m_buff,nfft*2);
 
-   // Perform FFT (put frequency-domain data into spectrum)
-   	kiss_fftr(cfg, (kiss_fft_scalar*)samples , spectrum);
+	// Perform FFT (put frequency-domain data into spectrum)
+	kiss_fftr(cfg, (kiss_fft_scalar*)samples , spectrum);
 
 
 //******************************************************//
@@ -119,29 +118,24 @@ for(int i = 0; i<epochCount -1; i++)
 	maxIndex = -1;
 
 // Same as above, but for midband
- for(int j = MidBegin; j<=MidEnd;j++)
- {
-
- 	magnitude = sqrt(spectrum[j].r * spectrum[j].r + spectrum[j].i * spectrum[j].i);
-	//oFile << magnitude<<" ";
-	if(magnitude >= maxVal)
-		{
-			peakMidFreq = j*freqConst;
-			maxVal = magnitude;
-			maxIndex = j;
+  for(int j = MidBegin; j<=MidEnd;j++) {
+		magnitude = sqrt(spectrum[j].r * spectrum[j].r + spectrum[j].i * spectrum[j].i);
+		//oFile << magnitude<<" ";
+		if(magnitude >= maxVal){
+				peakMidFreq = j*freqConst;
+				maxVal = magnitude;
+				maxIndex = j;
 		}
- }
+  }
  	maxVal = -1;
 	maxIndex = -1;
 
 // Same as above for treble band
- for(int j = TrebBegin; j<=TrebEnd;j++)
- {
+ for(int j = TrebBegin; j<=TrebEnd;j++) {
 
  	magnitude = sqrt(spectrum[j].r * spectrum[j].r + spectrum[j].i * spectrum[j].i);
 	//oFile << magnitude<<" ";
-	if(magnitude >= maxVal)
-		{
+	if(magnitude >= maxVal){
 			peakTrebFreq = j*freqConst;
 			maxVal = magnitude;
 			maxIndex = j;
@@ -149,25 +143,19 @@ for(int i = 0; i<epochCount -1; i++)
  }
 
 
-//This Delays output to sync with real-time playback of the song.
-//Remove this loop to perform FFT for whole song at Full Speed.
-while(REALTIME)
-{
-	t1 = clock();
-	float diff = (t1 - t0)*clockPeriod;
-	if (diff >= epochTime)
-	{
-		break;
+	//This Delays output to sync with real-time playback of the song.
+	//Remove this loop to perform FFT for whole song at Full Speed.
+	while(REALTIME) {
+		t1 = clock();
+		float diff = (t1 - t0)*clockPeriod;
+		if (diff >= epochTime)
+			break;
 	}
-}
 
+	cout <<"Bass Peak: "<<peakBassFreq<<"   Mid Peak: "<<peakMidFreq<<"   Treble Peak: "<<peakTrebFreq<<endl;
+	//SendFreqData(peakBassFreq, peakMidFreq, peakTrebFreq);
 
-
-cout <<"Bass Peak: "<<peakBassFreq<<"   Mid Peak: "<<peakMidFreq<<"   Treble Peak: "<<peakTrebFreq<<endl;
-//SendFreqData(peakBassFreq, peakMidFreq, peakTrebFreq);
-
-
-//oFile << "\n";
+	//oFile << "\n";
 }
 // free heap
 free(samples);

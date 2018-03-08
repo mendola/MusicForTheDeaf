@@ -17,15 +17,15 @@ using namespace std;
 #define TREBLEBANDBEGIN 301
 #define TREBLEBANDEND 2000
 
-#define MUSICLIBRARY "/home/local/ANT/mendolaa/Music"
+#define MUSICLIBRARY "../"
 
 
 class WavReader
 {
 public:
-        WavReader();
-        ~WavReader();
-        int GetWavInfo(ifstream& iFile);
+	WavReader();
+	~WavReader();
+	int GetWavInfo(ifstream& iFile);
 //        int ReadWav(std::ifstream& iFile, int* buffer, int buffLength);
 	int ReadWav(ifstream& iFile);
 	int GetPacketLength();
